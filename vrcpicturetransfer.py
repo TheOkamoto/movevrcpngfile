@@ -18,6 +18,7 @@ def parse_arguments():
     config = configparser.ConfigParser()
     try:
         config.read('config.ini')
+        console.print(f"\nConfiguration file loaded successfully", style="bold green")
     except Exception as e:
         console.print(f"Error loading configuration file: {e}", style="bold red")
 
@@ -53,7 +54,7 @@ def print_settings(source, destination, delay):
     table.add_row(source, destination, str(delay))
 
     # Print file transfer settings
-    console.print("File Transfer Settings", style="bold red")
+    console.print("\nFile Transfer Settings\n", style="bold red")
     console.print(table)
 
     # Print monitoring status
