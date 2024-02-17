@@ -6,6 +6,7 @@ import watchdog.events
 import watchdog.observers
 from rich.console import Console
 from rich.table import Table
+import pytest
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(description='Move files with a delay.')
