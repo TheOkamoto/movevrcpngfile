@@ -16,16 +16,20 @@ console = Console()
 def parse_arguments():
     # Load the configuration file
     config = configparser.ConfigParser()
-    try:
-        config.read('config.ini')
-        console.print(f"\nConfiguration file loaded successfully", style="bold green")
-    except Exception as e:
-        console.print(f"Error loading configuration file: {e}", style="bold red")
+    config_file_exists = os.path.isfile('config.ini')
+    if config_file_exists:
+        try:
+            config.read('config.ini')
+        except Exception as e:
+            console.print(f"Error loading configuration file: {e}", style="bold red")
+    else:
+        console.print("First launch detected. Please enter the source and destination.", style="bold yellow")
 
+    # Define command line arguments
     parser = argparse.ArgumentParser(description='Move files with a delay.')
-    parser.add_argument('--delay', type=int, default=config.getint('DEFAULT', 'Delay', fallback=1), help='The delay before moving files in seconds.')
-    parser.add_argument('--source', type=str, default=config.get('DEFAULT', 'Source', fallback=''), help='The source folder.')
-    parser.add_argument('--destination', type=str, default=config.get('DEFAULT', 'Destination', fallback=''), help='The destination folder.')
+    parser.add_argument('--delay', type=int, default=config.getint('DEFAULT', 'Delay', fallback=1) if config_file_exists else 1, help='The delay before moving files in seconds.')
+    parser.add_argument('--source', type=str, default=config.get('DEFAULT', 'Source', fallback='') if config_file_exists else input("Enter the source folder: "), help='The source folder.')
+    parser.add_argument('--destination', type=str, default=config.get('DEFAULT', 'Destination', fallback='') if config_file_exists else input("Enter the destination folder: "), help='The destination folder.')
     args = parser.parse_args()
 
     # Save the arguments to a configuration file
