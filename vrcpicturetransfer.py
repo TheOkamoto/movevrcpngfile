@@ -7,17 +7,36 @@ import watchdog.observers
 from rich.console import Console
 from rich.table import Table
 from rich.progress import Progress
+import configparser
 
 # Initialize console as a global variable
 console = Console()
 
 # Function to parse command line arguments
 def parse_arguments():
+    # Load the configuration file
+    config = configparser.ConfigParser()
+    try:
+        config.read('config.ini')
+    except Exception as e:
+        console.print(f"Error loading configuration file: {e}", style="bold red")
+
     parser = argparse.ArgumentParser(description='Move files with a delay.')
-    parser.add_argument('--delay', type=int, default=1, help='The delay before moving files in seconds.')
-    parser.add_argument('--source', type=str, required=True, help='The source folder.')
-    parser.add_argument('--destination', type=str, required=True, help='The destination folder.')
-    return parser.parse_args()
+    parser.add_argument('--delay', type=int, default=config.getint('DEFAULT', 'Delay', fallback=1), help='The delay before moving files in seconds.')
+    parser.add_argument('--source', type=str, default=config.get('DEFAULT', 'Source', fallback=''), help='The source folder.')
+    parser.add_argument('--destination', type=str, default=config.get('DEFAULT', 'Destination', fallback=''), help='The destination folder.')
+    args = parser.parse_args()
+
+    # Save the arguments to a configuration file
+    try:
+        config['DEFAULT'] = {'Delay': args.delay, 'Source': args.source, 'Destination': args.destination}
+        with open('config.ini', 'w') as configfile:
+            config.write(configfile)
+        console.print("Configuration file written successfully", style="bold green")
+    except Exception as e:
+        console.print(f"Error writing to configuration file: {e}", style="bold red")
+
+    return args
 
 # Function to create destination folder if it doesn't exist
 def create_destination_folder(destination):
