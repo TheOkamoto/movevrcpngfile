@@ -12,24 +12,49 @@ import configparser
 # Initialize console as a global variable
 console = Console()
 
+import os
+
 # Function to parse command line arguments
 def parse_arguments():
     # Load the configuration file
     config = configparser.ConfigParser()
     config_file_exists = os.path.isfile('config.ini')
+
+    # If configuration file exists, read it
     if config_file_exists:
         try:
             config.read('config.ini')
         except Exception as e:
             console.print(f"Error loading configuration file: {e}", style="bold red")
+    # If configuration file doesn't exist, prompt user for input
     else:
         console.print("First launch detected. Please enter the source and destination.", style="bold yellow")
 
     # Define command line arguments
     parser = argparse.ArgumentParser(description='Move files with a delay.')
-    parser.add_argument('--delay', type=int, default=config.getint('DEFAULT', 'Delay', fallback=1) if config_file_exists else 1, help='The delay before moving files in seconds.')
-    parser.add_argument('--source', type=str, default=config.get('DEFAULT', 'Source', fallback='') if config_file_exists else input("Enter the source folder: "), help='The source folder.')
-    parser.add_argument('--destination', type=str, default=config.get('DEFAULT', 'Destination', fallback='') if config_file_exists else input("Enter the destination folder: "), help='The destination folder.')
+    
+    # If configuration file exists, use its values as default
+    # Otherwise, prompt user for input and replace single backslashes with double backslashes
+    delay_default = config.getint('DEFAULT', 'Delay', fallback=1) if config_file_exists else 1
+
+    if config_file_exists:
+        source_default = config.get('DEFAULT', 'Source', fallback='')
+        destination_default = config.get('DEFAULT', 'Destination', fallback='')
+    else:
+        source_default = input("Enter the source folder: ").replace('\\', '\\\\')
+        while not os.path.isdir(source_default):
+            console.print("Invalid source folder. Please try again.", style="bold red")
+            source_default = input("Enter the source folder: ").replace('\\', '\\\\')
+
+        destination_default = input("Enter the destination folder: ").replace('\\', '\\\\')
+        while not os.path.isdir(destination_default):
+            console.print("Invalid destination folder. Please try again.", style="bold red")
+            destination_default = input("Enter the destination folder: ").replace('\\', '\\\\')
+
+    parser.add_argument('--delay', type=int, default=delay_default, help='The delay before moving files in seconds.')
+    parser.add_argument('--source', type=str, default=source_default, help='The source folder.')
+    parser.add_argument('--destination', type=str, default=destination_default, help='The destination folder.')
+    
     args = parser.parse_args()
 
     # Save the arguments to a configuration file
