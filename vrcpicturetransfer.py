@@ -6,6 +6,7 @@ import watchdog.events
 import watchdog.observers
 from rich.console import Console
 from rich.table import Table
+from rich.progress import Progress
 
 # Initialize console as a global variable
 console = Console()
@@ -51,13 +52,21 @@ def move_file(event, destination, delay):
     new_path = os.path.join(destination, os.path.relpath(source_file, args.source))
 
     try:
-        time.sleep(delay)  # Wait for the delay time before moving the file
+        # Wait for the delay time before moving the file
+        if delay > 2:
+            with Progress() as progress:
+                task = progress.add_task("[cyan]Moving file...", total=delay)
+                for _ in range(delay):
+                    time.sleep(1)
+                    progress.update(task, advance=1)
+        else:
+            time.sleep(delay)
+
         os.makedirs(os.path.dirname(new_path), exist_ok=True)  # Create the directory if it doesn't exist
         shutil.move(source_file, new_path)
         console.print(f"File '{source_file}' moved to '{new_path}' successfully", style="bold blue")
     except (PermissionError, IOError) as e:
         console.print(f"Error moving file '{source_file}': {e}", style="bold red")
-
 # Monitor the folder for new files
 class FolderWatchdog(watchdog.events.FileSystemEventHandler):
     def __init__(self, destination, delay):
