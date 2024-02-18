@@ -17,6 +17,7 @@ Tested with Python 3.11.5 and 3.12
 To run the script you will need to install the `Watchdog` and `Rich` packages via `pip`
 
 You can do that by writing the following commands:
+
 `pip install rich`
 
 `pip install watchdog`
