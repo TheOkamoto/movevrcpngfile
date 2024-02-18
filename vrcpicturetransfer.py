@@ -62,7 +62,7 @@ def parse_arguments():
     
     # If configuration file exists, use its values as default
     # Otherwise, prompt user for input and replace single backslashes with double backslashes
-    delay_default = config.getint('DEFAULT', 'Delay', fallback=1) if config_file_exists else 1
+    delay_default = config.getint('DEFAULT', 'Delay', fallback=2) if config_file_exists else 2
 
     source_default, destination_default = get_args(config, config_file_exists)
 
