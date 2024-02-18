@@ -22,7 +22,7 @@ def save_to_config_file(args, config):
     except Exception as e:
         console.print(f"Error writing to configuration file: {e}", style="bold red")
 
-def read_config_file(config):
+def read_config_file(config, config_file_exists):
     if config_file_exists:
         try:
             config.read('config.ini')
@@ -32,7 +32,7 @@ def read_config_file(config):
     else:
         console.print("First launch detected. Please enter the source and destination.", style="bold yellow")
 
-def get_args(config):
+def get_args(config, config_file_exists):
     if config_file_exists:
         source_default = config.get('DEFAULT', 'Source', fallback='')
         destination_default = config.get('DEFAULT', 'Destination', fallback='')
@@ -55,7 +55,7 @@ def parse_arguments():
     config = configparser.ConfigParser()
     config_file_exists = os.path.isfile('config.ini')
 
-    read_config_file(config)
+    read_config_file(config, config_file_exists)
 
     # Define command line arguments
     parser = argparse.ArgumentParser(description='Move files with a delay.')
@@ -64,7 +64,7 @@ def parse_arguments():
     # Otherwise, prompt user for input and replace single backslashes with double backslashes
     delay_default = config.getint('DEFAULT', 'Delay', fallback=1) if config_file_exists else 1
 
-    source_default, destination_default = get_args(config)
+    source_default, destination_default = get_args(config, config_file_exists)
 
     parser.add_argument('--delay', type=int, default=delay_default, help='The delay before moving files in seconds.')
     parser.add_argument('--source', type=str, default=source_default, help='The source folder.')
