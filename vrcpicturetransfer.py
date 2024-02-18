@@ -139,13 +139,15 @@ def move_file(event, destination, delay):
 
     try:
         # Wait for the delay time before moving the file
-        if delay <= 2: time.sleep(delay)
+        if delay >= 2: 
+            with Progress() as progress:
+                task = progress.add_task("[cyan]Moving file...", total=delay)
+                for _ in range(delay):
+                    time.sleep(1)
+                    progress.update(task, advance=1)
+        else: 
+            time.sleep(delay)
 
-        with Progress() as progress:
-            task = progress.add_task("[cyan]Moving file...", total=delay)
-            for _ in range(delay):
-                time.sleep(1)
-                progress.update(task, advance=1)
 
         os.makedirs(os.path.dirname(new_path), exist_ok=True)  # Create the directory if it doesn't exist
         shutil.move(source_file, new_path)
