@@ -13,7 +13,7 @@ import configparser
 console = Console()
 
 # Save the arguments to a configuration file
-def save_to_config_file(args):
+def save_to_config_file(args, config):
     try:
         config['DEFAULT'] = {'Delay': args.delay, 'Source': args.source, 'Destination': args.destination}
         with open('config.ini', 'w') as configfile:
@@ -32,7 +32,7 @@ def read_config_file(config):
     else:
         console.print("First launch detected. Please enter the source and destination.", style="bold yellow")
 
-def get_args():
+def get_args(config):
     if config_file_exists:
         source_default = config.get('DEFAULT', 'Source', fallback='')
         destination_default = config.get('DEFAULT', 'Destination', fallback='')
@@ -64,7 +64,7 @@ def parse_arguments():
     # Otherwise, prompt user for input and replace single backslashes with double backslashes
     delay_default = config.getint('DEFAULT', 'Delay', fallback=1) if config_file_exists else 1
 
-    source_default, destination_default = get_args()
+    source_default, destination_default = get_args(config)
 
     parser.add_argument('--delay', type=int, default=delay_default, help='The delay before moving files in seconds.')
     parser.add_argument('--source', type=str, default=source_default, help='The source folder.')
@@ -74,7 +74,7 @@ def parse_arguments():
 
     # After the first setup, ask the user if they want to add more source/destination pairs
     if config_file_exists:
-        save_to_config_file(args)
+        save_to_config_file(args, config)
         return args
 
     add_more = input("Do you want to add more source/destination pairs? (yes/no): ")
@@ -102,7 +102,7 @@ def parse_arguments():
         for i, (source, destination) in enumerate(zip(more_sources, more_destinations)):
             config[f'PAIR{i+1}'] = {'Source': source, 'Destination': destination}
 
-    save_to_config_file(args)
+    save_to_config_file(args, config)
 
     return args
 
