@@ -12,8 +12,6 @@ import configparser
 # Initialize console as a global variable
 console = Console()
 
-import os
-
 # Function to parse command line arguments
 def parse_arguments():
     # Load the configuration file
@@ -56,6 +54,33 @@ def parse_arguments():
     parser.add_argument('--destination', type=str, default=destination_default, help='The destination folder.')
     
     args = parser.parse_args()
+
+    # After the first setup, ask the user if they want to add more source/destination pairs
+    if not config_file_exists:
+        add_more = input("Do you want to add more source/destination pairs? (yes/no): ")
+        if add_more.lower() == 'yes':
+            more_sources = []
+            more_destinations = []
+            while True:
+                more_source = input("Enter an additional source folder (or 'done' to finish): ").replace('\\', '\\\\')
+                if more_source.lower() == 'done':
+                    break
+                while not os.path.isdir(more_source):
+                    console.print("Invalid source folder. Please try again.", style="bold red")
+                    more_source = input("Enter an additional source folder (or 'done' to finish): ").replace('\\', '\\\\')
+                more_sources.append(more_source)
+
+                more_destination = input("Enter an additional destination folder (or 'done' to finish): ").replace('\\', '\\\\')
+                if more_destination.lower() == 'done':
+                    break
+                while not os.path.isdir(more_destination):
+                    console.print("Invalid destination folder. Please try again.", style="bold red")
+                    more_destination = input("Enter an additional destination folder (or 'done' to finish): ").replace('\\', '\\\\')
+                more_destinations.append(more_destination)
+
+            # Save the additional source/destination pairs to the configuration file
+            for i, (source, destination) in enumerate(zip(more_sources, more_destinations)):
+                config[f'PAIR{i+1}'] = {'Source': source, 'Destination': destination}
 
     # Save the arguments to a configuration file
     try:
