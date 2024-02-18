@@ -22,7 +22,7 @@ def save_to_config_file(args):
     except Exception as e:
         console.print(f"Error writing to configuration file: {e}", style="bold red")
 
-def read_config_file():
+def read_config_file(config):
     if config_file_exists:
         try:
             config.read('config.ini')
@@ -55,7 +55,7 @@ def parse_arguments():
     config = configparser.ConfigParser()
     config_file_exists = os.path.isfile('config.ini')
 
-    read_config()
+    read_config_file(config)
 
     # Define command line arguments
     parser = argparse.ArgumentParser(description='Move files with a delay.')
