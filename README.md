@@ -2,11 +2,11 @@ This simple Python script moves PNG files from one folder to another.
 
 Accepted command line parameters:
 
-    `--delay`       The delay before moving files in seconds.
+    --delay       The delay before moving files in seconds.
     
-    `--source`      The source folder.
+    --source      The source folder.
     
-    `--destination` The destination folder.
+    --destination The destination folder.
     
 You can also freely edit the `config.ini` file to change parameters manually.
 
