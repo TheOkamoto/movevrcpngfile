@@ -14,9 +14,9 @@ You can also freely edit the `config.ini` file to change parameters manually.
 
 Tested with Python 3.11.5 and 3.12
 
-To run the script you will need to install the `Watchdog` and `Rich` packages via `pip`
+To run the script you will need to install the `watchdog` and `rich` packages via `pip`
 
-You can do that by writing the following commands:
+You can do it by writing the following commands:
 
 `pip install rich`
 
