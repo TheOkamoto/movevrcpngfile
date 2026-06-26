@@ -12,20 +12,26 @@ import configparser
 # Initialize console as a global variable
 console = Console()
 
+# --- CONFIGURATION FILE PATH FIX ---
+# Ensures config.ini is always read and saved in the same folder as this script (.py)
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+CONFIG_PATH = os.path.join(CURRENT_DIR, 'config.ini')
+# ---------------------------------------------------
+
 # Save the arguments to a configuration file
 def save_to_config_file(args, config):
     try:
         config['DEFAULT'] = {'Delay': args.delay, 'Source': args.source, 'Destination': args.destination}
-        with open('config.ini', 'w') as configfile:
+        with open(CONFIG_PATH, 'w') as configfile:
             config.write(configfile)
-        console.print("Configuration file written successfully", style="bold green")
+        console.print(f"Configuration file written successfully at: {CONFIG_PATH}", style="bold green")
     except Exception as e:
         console.print(f"Error writing to configuration file: {e}", style="bold red")
 
 def read_config_file(config, config_file_exists):
     if config_file_exists:
         try:
-            config.read('config.ini')
+            config.read(CONFIG_PATH)
         except Exception as e:
             console.print(f"Error loading configuration file: {e}", style="bold red")
     # If configuration file doesn't exist, prompt user for input
@@ -53,7 +59,7 @@ def get_args(config, config_file_exists):
 def parse_arguments():
     # Load the configuration file
     config = configparser.ConfigParser()
-    config_file_exists = os.path.isfile('config.ini')
+    config_file_exists = os.path.isfile(CONFIG_PATH)
 
     read_config_file(config, config_file_exists)
 
@@ -154,6 +160,7 @@ def move_file(event, destination, delay):
         console.print(f"File '{source_file}' moved to '{new_path}' successfully", style="bold blue")
     except (PermissionError, IOError) as e:
         console.print(f"Error moving file '{source_file}': {e}", style="bold red")
+        
 # Monitor the folder for new files
 class FolderWatchdog(watchdog.events.FileSystemEventHandler):
     def __init__(self, destination, delay):
